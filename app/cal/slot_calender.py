@@ -18,8 +18,11 @@ class SlotCalender:
         to attend it in names_list.
         The algorithm filters out slots that are not in the name list, then creates a new list of tuples
         with start and end hours, and sorts it for iteration.
-        while iterating we compare the end time with the beginning time of the next slot to find an available
-        hour.
+        The algorithm compares the latest meeting time with the next pair ending meeting time and uses the max
+        to continue iterating and find the next available meeting.
+        RESTRICTION: we will return the first available slot in a time window of a few hours.
+        If the first available slot is at 13:00 and the next meeting is that 15:00 we will return 13:00, while
+        every minute from 13:00 to 14:00 is actually available.
         :param names_list: list of names. Should match the name in the cal list. e.g. ["Bob", "Alice"]
         :param event_duration_in_hours: duration of the event. e g 1 for 1 hour.
         :return: list of available slots in datetime format.
