@@ -1,10 +1,10 @@
 from app.util.date_util import str_to_hour_minute
 from datetime import timedelta
 
-class SlotCalender:
+START_HOUR = str_to_hour_minute("07:00")
+END_HOUR = str_to_hour_minute("19:00")
 
-    START_HOUR = str_to_hour_minute("07:00")
-    END_HOUR = str_to_hour_minute("19:00")
+class SlotCalender:
 
     def __init__(self, calendar_lines):
         """
@@ -26,13 +26,17 @@ class SlotCalender:
         """
         duration = timedelta(hours=event_duration_in_hours)
         busy_slots = self.get_busy_slots_for_names_list(names_list)
-        sorted_busy_slots = self.get_sort_busy_slots(busy_slots)
-
+        pairs = self.get_sort_busy_slots(busy_slots)
         available_slots = []
-        for start, end in self.prepare_pairs_to_compare(sorted_busy_slots):
-            while start + duration <= end:
-                available_slots.append(start)
-                start += duration
+        latest_busy_time = START_HOUR
+        i = 0
+        while latest_busy_time <= END_HOUR and i < len(pairs) - 1:
+            start_next_meeting = pairs[i+1][0]
+            if latest_busy_time + duration <= start_next_meeting:
+                available_slots.append(latest_busy_time)
+
+            latest_busy_time = max(pairs[i+1][1], latest_busy_time)
+            i += 1
 
         return available_slots
 
@@ -40,7 +44,4 @@ class SlotCalender:
         return [(line.start_time, line.end_time) for line in self.calender_lines if line.name in set(names_list)]
 
     def get_sort_busy_slots(self, slots):
-        return sorted([(self.START_HOUR, self.START_HOUR)] + slots + [(self.END_HOUR, self.END_HOUR)])
-
-    def prepare_pairs_to_compare(self, slots):
-        return ((slots[i][1], slots[i + 1][0]) for i in range(len(slots) - 1))
+        return sorted([(START_HOUR, START_HOUR)] + slots + [(END_HOUR, END_HOUR)])
