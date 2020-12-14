@@ -10,7 +10,7 @@ def test_it_should_return_slots_for_person_names():
     ]
     slots = SlotCalender(calender_lines).find_available_slots(["Alice", "John"], event_duration_in_hours=1)
     result = ["{:d}:{:02d}".format(slot.hour, slot.minute) for slot in slots]
-    expected = ['7:00', '8:00', '9:00', '12:00', '13:00', '14:00']
+    expected = ['7:00', '12:00']
     assert result == expected
 
 def test_it_should_return_nothing_if_none_are_available():
